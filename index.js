@@ -1,6 +1,6 @@
 const tress = require('tress'),
     needle = require('needle'), 
-    cheerio = require("cheerio"),
+    cheerio = require('cheerio'),
     MongoClient = require('mongodb').MongoClient;
     assert = require('assert'),
     Server = 'mongodb://localhost:27017';
