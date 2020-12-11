@@ -10,5 +10,5 @@
 6. Создать в кластере базу данных с названием "fanficsdb", а внутри нее коллекцию с названием "fanfics". 
 7. Создать юзера со всеми правами.
 8. Создать в "fanfics" объекты c названием нужного вам фэндома, ссылкой на него (в конце добавить ключ ?p=) и количеством фанфиков в значении 0. ID создается автоматически. Выглядеть должно так: { "_id": {"$oid": "5fbd52194c8f4b6314d6b5e1"}, "name": "Гарри Поттер", "url": "https://ficbook.net/fanfiction/books/harri_potter?p=", "count": 0 } 
-9. Заменить в файле "index.js" в строке 6 путь к базе данных на путь с вашими данными [mongodb+srv://username:password@<clustername>.xmsaf.mongodb.net/fanficsdb?retryWrites=true&w=majority]. 
+9. Заменить в файле "index.js" путь в строке 6 на путь к вашей базе данных: [mongodb+srv://username:password@<clustername>.xmsaf.mongodb.net/fanficsdb?retryWrites=true&w=majority]. 
 10. Запустить парсер в консоли стандартной командой [node index.js]. Первый запуск парсера добавит количество фанфиков в базу данных. Последующие запуски отобразят в консоли количество новых фанфиков при их наличии.
