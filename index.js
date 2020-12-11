@@ -1,46 +1,40 @@
 const tress = require('tress'),
-    needle = require('needle'), 
-    cheerio = require('cheerio'),
-    MongoClient = require('mongodb').MongoClient;
-    assert = require('assert'),
-    uri = 'mongodb+srv://<username>:<password>@<clustername>.xmsaf.mongodb.net/fanficsdb?retryWrites=true&w=majority';
-    
+      needle = require('needle'), 
+      cheerio = require('cheerio'),
+      assert = require('assert'),
+      MongoClient = require('mongodb').MongoClient,
+      uri = 'mongodb+srv://<username>:<password>@<cluster>.xmsaf.mongodb.net/<database>?retryWrites=true&w=majority';    
     
 MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, function(err, client) {
   assert.equal(null, err);
-  console.log("Connected successfully to server");
- 
+  console.log("Connected successfully to server"); 
   const collection = client.db('fanficsdb').collection('fanfics');        
-     
-    
-  // Получение данных с сайта  
-  
+         
+  // Получить данные с сайта    
   function scrape (link, fanficContext) {   
     needle.get(`${link}?p=1`, function(err, res) {    
-    // выяснение количество страниц на странице фэндома
+    // вычислить количество страниц на странице фэндома
       if (err) throw err; 
       let $ = cheerio.load(res.body),
           page = $(".pagenav .paging-description b:last-of-type").html();       
       page = page ? page : 1;
         
       needle.get(`${link}?p=${page}`, function(err, res) { 
-      // вычисление количества фанфиков на всех страницах
+      // вычислить количество фанфиков на всех страницах
         if (err) throw err; 
         $ = cheerio.load(res.body); 
         let articles = $(".fanfic-thumb-block:last-of-type .block").length;         
         if (page != 1) {
           articles = (page - 1) * 20 + articles;
         }
-        fanficContext.setArticleCount(articles); // установка значения в свойство articleCount
-        fanficContext.checkIsNew(); // проверка разницы между oldArticleCount и articleCount 
-        fanficContext.saveCount(); // сохранение значения articleCount в БД          
+        fanficContext.setArticleCount(articles); // установить значение в свойство articleCount
+        fanficContext.checkIsNew(); // проверить разницу между oldArticleCount и articleCount 
+        fanficContext.saveCount(); // сохранить значение articleCount в БД          
       });        
     });      
-  } // end scrape
+  } // end function scrape
 
-
-  // Рабочий объект
-  
+  // Рабочий объект  
   let fanficObj = {
     id: '',
     name: '',
@@ -51,23 +45,22 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
       scrape (this.url, this);
     },
     setArticleCount: function (count) {
-    // добавление в объект новое количество фанфиков
+    // добавить в объект новое количество фанфиков
       this.articleCount = count;
     },
     hasNew: function () {
-    // сравнение нового и старого количества фанфиков
+    // сравнить новое и старое количество фанфиков
       return this.articleCount - this.oldArticleCount;
     },
     checkIsNew: function () {
-    // вывод после сравнения количества добавленных фанфиков  
+    // вывести после сравнения количество добавленных фанфиков  
       let difference = this.hasNew();
       if (difference > 0) {    
         console.log(`${this.name}: новых ${difference}\n${this.url}\n`); 
-      }
-    },
-    
+      } 
+    },    
     saveCount: function () {
-    // сохранение нового кол-ва фанфиков в базу данных
+    // сохранить новое кол-во фанфиков в БД
       const name = this.name,
             count = this.articleCount;  
       
@@ -82,31 +75,25 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     
   } // end fanficObj   
   
-  //Создание массива с данными из БД 
-    
+  //Создать массив с данными из БД     
   async function readCollection() {
-    // получение массива данных из БД
+    // получить массив данных из БД
     const result = await collection.find({}).toArray(),
           fanfics = []; 
     console.log(`Всего фанфиков: ${result.length}`);
-          
     
-    // Создание объектов с использованием данных из БД и добавление их в массив fanfics
-
+    // Создать объекты с использованием данных из БД и добавить их в массив fanfics
     for (let i = 0; i < result.length; i++) {
-      // создание архива с объектами
+      // создать архив с объектами
       let fanfic = Object.assign({}, fanficObj);
       fanfic.url = result[i].url;
       fanfic.name = result[i].name;
       fanfic.id = result[i]._id;
       fanfic.oldArticleCount = result[i].count;  
       fanfics.push(fanfic);
-      //console.log(JSON.stringify(fanfic));
-    }
-    
+    }    
       
-    // Вызов функции loadArticleCount для каждого элемента созданного массива с объектами
-       
+    // Вызвать функцию loadArticleCount для каждого элемента созданного массива с объектами с задержкой      
     for (let i = 0; i < fanfics.length; i++) { 
      (ind => setTimeout (function () { 
        fanfics[i].loadArticleCount();
@@ -115,6 +102,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
      )(i); 
     } 
                   
-  } // end readCollection     
-  readCollection(); // вызов функции readCollection
+  } // end function readCollection    
+  
+  readCollection(); // вызвать функцию readCollection  
 }); 
