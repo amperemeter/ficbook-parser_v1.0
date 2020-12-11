@@ -16,14 +16,14 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
   // Получение данных с сайта  
   
   function scrape (link, fanficContext) {   
-    needle.get(link + 1, function(err, res) {    
+    needle.get(`${link}?p=1`, function(err, res) {    
     // выяснение количество страниц на странице фэндома
       if (err) throw err; 
       let $ = cheerio.load(res.body),
           page = $(".pagenav .paging-description b:last-of-type").html();       
       page = page ? page : 1;
         
-      needle.get(link + page, function(err, res) {
+      needle.get(`${link}?p=${page}`, function(err, res) { 
       // вычисление количества фанфиков на всех страницах
         if (err) throw err; 
         $ = cheerio.load(res.body); 
@@ -62,7 +62,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     // вывод после сравнения количества добавленных фанфиков  
       let difference = this.hasNew();
       if (difference > 0) {    
-        console.log(`${this.name}: новых ${difference}\n${this.url + 1}\n`); 
+        console.log(`${this.name}: новых ${difference}\n${this.url}\n`); 
       }
     },
     
