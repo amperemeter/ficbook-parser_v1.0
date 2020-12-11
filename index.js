@@ -3,7 +3,7 @@ const tress = require('tress'),
     cheerio = require('cheerio'),
     MongoClient = require('mongodb').MongoClient;
     assert = require('assert'),
-    uri = 'mongodb+srv://<username.:<password>@<clustername>.xmsaf.mongodb.net/fanficsdb?retryWrites=true&w=majority';
+    uri = 'mongodb+srv://<username>:<password>@<clustername>.xmsaf.mongodb.net/fanficsdb?retryWrites=true&w=majority';
     
     
 MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, function(err, client) {
