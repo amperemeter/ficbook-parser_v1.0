@@ -3,20 +3,19 @@ const tress = require('tress'),
     cheerio = require('cheerio'),
     MongoClient = require('mongodb').MongoClient;
     assert = require('assert'),
-    Server = 'mongodb://localhost:27017';
+    uri = 'mongodb+srv://<username.:<password>@parser.xmsaf.mongodb.net/fanficsdb?retryWrites=true&w=majority';
     
     
-MongoClient.connect(Server, {useUnifiedTopology: true, useNewUrlParser: true}, function(err, client) {
+MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, function(err, client) {
   assert.equal(null, err);
   console.log("Connected successfully to server");
  
-  const db = client.db('moviesdb'),
-        collection = db.collection('movies');        
+  const collection = client.db('fanficsdb').collection('fanfics');        
      
     
   // Получение данных с сайта  
   
-  function scrape (link, movieContext) {   
+  function scrape (link, fanficContext) {   
     needle.get(link + 1, function(err, res) {    
     // выяснение количество страниц на странице фэндома
       if (err) throw err; 
@@ -32,9 +31,9 @@ MongoClient.connect(Server, {useUnifiedTopology: true, useNewUrlParser: true}, f
         if (page != 1) {
           articles = (page - 1) * 20 + articles;
         }
-        movieContext.setArticleCount(articles); // установка значения в свойство articleCount
-        movieContext.checkIsNew(); // проверка разницы между oldArticleCount и articleCount 
-        movieContext.saveCount(); // сохранение значения articleCount в БД          
+        fanficContext.setArticleCount(articles); // установка значения в свойство articleCount
+        fanficContext.checkIsNew(); // проверка разницы между oldArticleCount и articleCount 
+        fanficContext.saveCount(); // сохранение значения articleCount в БД          
       });        
     });      
   } // end scrape
@@ -42,7 +41,7 @@ MongoClient.connect(Server, {useUnifiedTopology: true, useNewUrlParser: true}, f
 
   // Рабочий объект
   
-  let movieObj = {
+  let fanficObj = {
     id: '',
     name: '',
     url: '',
@@ -52,15 +51,15 @@ MongoClient.connect(Server, {useUnifiedTopology: true, useNewUrlParser: true}, f
       scrape (this.url, this);
     },
     setArticleCount: function (count) {
-    // добавление в объект новое количество блоков
+    // добавление в объект новое количество фанфиков
       this.articleCount = count;
     },
     hasNew: function () {
-    // сравнение нового и старого количества блоков
+    // сравнение нового и старого количества фанфиков
       return this.articleCount - this.oldArticleCount;
     },
     checkIsNew: function () {
-    // вывод после сравнения количества добавленных блоков  
+    // вывод после сравнения количества добавленных фанфиков  
       let difference = this.hasNew();
       if (difference > 0) {    
         console.log(`${this.name}: новых ${difference}\n${this.url + 1}\n`); 
@@ -68,7 +67,7 @@ MongoClient.connect(Server, {useUnifiedTopology: true, useNewUrlParser: true}, f
     },
     
     saveCount: function () {
-    // сохранение нового кол-ва блоков в базу данных
+    // сохранение нового кол-ва фанфиков в базу данных
       const name = this.name,
             count = this.articleCount;  
       
@@ -81,42 +80,41 @@ MongoClient.connect(Server, {useUnifiedTopology: true, useNewUrlParser: true}, f
      
     }      
     
-  } // end movieObj   
+  } // end fanficObj   
   
   //Создание массива с данными из БД 
     
   async function readCollection() {
     // получение массива данных из БД
     const result = await collection.find({}).toArray(),
-          movies = []; 
+          fanfics = []; 
     console.log(`Всего фанфиков: ${result.length}`);
           
     
-    // Создание объектов с использованием данных из БД и добавление их в массив movies
+    // Создание объектов с использованием данных из БД и добавление их в массив fanfics
 
     for (let i = 0; i < result.length; i++) {
       // создание архива с объектами
-      let movie = Object.assign({}, movieObj);
-      movie.url = result[i].url;
-      movie.name = result[i].name;
-      movie.id = result[i]._id;
-      movie.oldArticleCount = result[i].count;  
-      movies.push(movie);
-      //console.log(JSON.stringify(movie));
+      let fanfic = Object.assign({}, fanficObj);
+      fanfic.url = result[i].url;
+      fanfic.name = result[i].name;
+      fanfic.id = result[i]._id;
+      fanfic.oldArticleCount = result[i].count;  
+      fanfics.push(fanfic);
+      //console.log(JSON.stringify(fanfic));
     }
     
       
     // Вызов функции loadArticleCount для каждого элемента созданного массива с объектами
        
-    for (let i = 0; i < movies.length; i++) { 
+    for (let i = 0; i < fanfics.length; i++) { 
      (ind => setTimeout (function () { 
-       movies[i].loadArticleCount();
+       fanfics[i].loadArticleCount();
        console.log(i + 1);
       }, 1000 + (5000 * ind))
      )(i); 
     } 
                   
-  } // end readCollection    
-  
+  } // end readCollection     
   readCollection(); // вызов функции readCollection
 }); 
