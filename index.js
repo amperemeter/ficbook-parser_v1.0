@@ -80,7 +80,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     // получить массив данных из БД
     const result = await collection.find({}).toArray(),
           fanfics = []; 
-    console.log(`Всего фанфиков: ${result.length}`);
+    console.log(`Всего фэндомов: ${result.length}`);
     
     // Создать объекты с использованием данных из БД и добавить их в массив fanfics
     for (let i = 0; i < result.length; i++) {
