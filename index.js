@@ -55,26 +55,26 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     checkIsNew: function () {
     // вывести после сравнения количество добавленных фанфиков  
       let difference = this.hasNew();
-      if (difference > 0) {    
+      if (difference != 0) {    
         console.log(`${this.name}: новых ${difference}\n${this.url}\n`); 
-      } 
+      } else {
+        console.log(0);
+      }
     },    
     saveCount: function () {
     // сохранить новое кол-во фанфиков в БД
       const name = this.name,
-            count = this.articleCount;  
-      
+            count = this.articleCount;       
       try {  
         collection.updateOne({name: name}, {$set: {count: count}});
       }       
       catch(err) {
         console.log('Error: ' + err);
-      }   
-     
+      }        
     }      
     
   } // end fanficObj   
-  
+   
   //Создать массив с данными из БД     
   async function readCollection() {
     // получить массив данных из БД
@@ -97,10 +97,10 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     for (let i = 0; i < fanfics.length; i++) { 
      (ind => setTimeout (function () { 
        fanfics[i].loadArticleCount();
-       console.log(i + 1);
-      }, 1000 + (5000 * ind))
+      }, 1000 + (2000 * ind))
      )(i); 
-    } 
+    }
+    setTimeout (() => console.log("Конец!"), 1000 + (2000 * fanfics.length)); 
                   
   } // end function readCollection    
   
