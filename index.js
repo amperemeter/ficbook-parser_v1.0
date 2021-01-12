@@ -98,8 +98,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
        if (i == fanfics.length - 1) {
        setTimeout (() => console.log("Конец!"), 1000); 
        setTimeout (() => client.close(), 1500); 
-       }  
-       console.log(i + 1);
+       }
       }, 1000 + (1000 * ind))
      )(i); 
     } 
