@@ -57,8 +57,6 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
       let difference = this.hasNew();
       if (difference != 0) {    
         console.log(`${this.name}: новых ${difference}\n${this.url}\n`); 
-      } else {
-        console.log(0);
       }
     },    
     saveCount: function () {
@@ -97,12 +95,16 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     for (let i = 0; i < fanfics.length; i++) { 
      (ind => setTimeout (function () { 
        fanfics[i].loadArticleCount();
-      }, 1000 + (2000 * ind))
+       if (i == fanfics.length - 1) {
+       setTimeout (() => console.log("Конец!"), 1000); 
+       setTimeout (() => client.close(), 1500); 
+       }  
+       console.log(i + 1);
+      }, 1000 + (1000 * ind))
      )(i); 
-    }
-    setTimeout (() => console.log("Конец!"), 1000 + (2000 * fanfics.length)); 
+    } 
                   
   } // end function readCollection    
   
-  readCollection(); // вызвать функцию readCollection  
+  readCollection(); // вызвать функцию readCollection      
 }); 
