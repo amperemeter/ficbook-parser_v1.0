@@ -70,8 +70,8 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
       try {  
         await collection.updateOne({name: name}, {$set: {count: count}});
         if (this.last == true) {
+          client.close();               
           console.timeEnd("Конец работы");
-          client.close(); 
         } 
       }       
       catch(err) {
