@@ -7,7 +7,6 @@ const tress = require('tress'),
     
 MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, function(err, client) {
   assert.equal(null, err);
-  console.log("Connected successfully to server"); 
   const collection = client.db('fanficsdb').collection('fanfics');  
      
          
