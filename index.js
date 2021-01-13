@@ -70,7 +70,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
       try {  
         await collection.updateOne({name: name}, {$set: {count: count}});
         if (this.last == true) {
-          console.timeEnd("Конец");
+          console.timeEnd("Конец работы");
           client.close(); 
         } 
       }       
@@ -87,7 +87,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     const result = await collection.find({}).toArray(),
           fanfics = []; 
     console.log(`Всего фэндомов: ${result.length}\n`);
-    console.time("Конец");
+    console.time("Конец работы");
     
     // Создать объекты с использованием данных из БД и добавить их в массив fanfics
     for (let i = 0; i < result.length; i++) {
