@@ -97,8 +97,6 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
     for (let i = 0; i < fanfics.length; i++) { 
      (ind => setTimeout (function () { 
        fanfics[i].loadArticleCount();
-       if (i == fanfics.length - 1) {
-       }
       }, 1000 + (1000 * ind))
      )(i); 
     } 
