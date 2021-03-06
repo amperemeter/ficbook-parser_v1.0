@@ -23,7 +23,7 @@ MongoClient.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true}, func
       // вычислить количество фанфиков на всех страницах
         if (err) throw err; 
         $ = cheerio.load(res.body); 
-        let articles = $(".fanfic-thumb-block:last-of-type .block").length;         
+        let articles = $(".fanfic-thumb-block:last-of-type .fanfic-inline").length;
         if (page != 1) {
           articles = (page - 1) * 20 + articles;
         }
